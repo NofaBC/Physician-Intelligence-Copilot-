@@ -274,7 +274,7 @@
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
               <div>
                 <h3 class="font-semibold text-lg">Encounter Note Assistant</h3>
-                <p class="text-sm text-slate-500">Ambient note-taking simulation with clinician review required.</p>
+                <p class="text-sm text-slate-500">Ambient multilingual note-taking simulation with clinician review required.</p>
               </div>
               <div class="flex gap-2">
                 <button id="encounterToggle" class="px-4 py-2 rounded-xl bg-cyan-600 text-white text-sm font-medium">● Start Encounter</button>
@@ -282,6 +282,33 @@
               </div>
             </div>
             <div id="encounterStatus" class="rounded-xl border border-slate-200 bg-slate-50 p-4 mb-4 text-sm text-slate-600">Ready. No audio is recorded in this prototype.</div>
+            <div class="grid md:grid-cols-3 gap-3 mb-4">
+              <div>
+                <label class="text-xs text-slate-500">Spoken language</label>
+                <select id="encounterLanguage" class="mt-1 w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white">
+                  <option value="en">English</option>
+                  <option value="es">Spanish</option>
+                  <option value="fa">Persian / Farsi</option>
+                  <option value="fr">French</option>
+                  <option value="ar">Arabic</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs text-slate-500">Transcript view</label>
+                <select id="transcriptView" class="mt-1 w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white">
+                  <option value="original">Original language</option>
+                  <option value="bilingual">Bilingual</option>
+                  <option value="english">English translation</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs text-slate-500">Clinical note language</label>
+                <select id="noteLanguage" class="mt-1 w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white">
+                  <option value="en">English</option>
+                  <option value="original">Same as patient language</option>
+                </select>
+              </div>
+            </div>
             <div class="grid md:grid-cols-2 gap-4">
               <div class="rounded-xl border border-slate-200 p-4">
                 <div class="flex items-center justify-between mb-3"><div class="font-medium">Live Transcript</div><span id="liveBadge" class="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-500">Idle</span></div>
@@ -446,31 +473,77 @@
     document.getElementById('workflowStatus').textContent = `${btn.querySelector('.font-medium').textContent} queued for clinician review — no action is executed automatically in this prototype.`;
   }));
 
-  const encounterLines = [
-    ['Physician', 'Good morning. How have you been feeling since the medication dose was changed?'],
-    ['Patient', 'My blood pressure is a little better, but I have had some dizziness a few times, mostly when I stand up.'],
-    ['Physician', 'Any fainting, chest pain, or shortness of breath?'],
-    ['Patient', 'No. I sent two messages about the dizziness, but otherwise I have been okay.'],
-    ['Physician', 'I see the cardiology visit was completed. The follow-up metabolic panel is still outstanding. Let us complete that and keep tracking your home readings.'],
-    ['Patient', 'Okay. When should I come back?'],
-    ['Physician', 'Let us plan a six-month follow-up, sooner if symptoms change.']
-  ];
+  const encounterScripts = {
+    en: [
+      ['Physician', 'Good morning. How have you been feeling since the medication dose was changed?', 'Good morning. How have you been feeling since the medication dose was changed?'],
+      ['Patient', 'My blood pressure is a little better, but I have had some dizziness a few times, mostly when I stand up.', 'My blood pressure is a little better, but I have had some dizziness a few times, mostly when I stand up.'],
+      ['Physician', 'Any fainting, chest pain, or shortness of breath?', 'Any fainting, chest pain, or shortness of breath?'],
+      ['Patient', 'No. I sent two messages about the dizziness, but otherwise I have been okay.', 'No. I sent two messages about the dizziness, but otherwise I have been okay.'],
+      ['Physician', 'I see the cardiology visit was completed. The follow-up metabolic panel is still outstanding. Let us complete that and keep tracking your home readings.', 'I see the cardiology visit was completed. The follow-up metabolic panel is still outstanding. Let us complete that and keep tracking your home readings.'],
+      ['Patient', 'Okay. When should I come back?', 'Okay. When should I come back?'],
+      ['Physician', 'Let us plan a six-month follow-up, sooner if symptoms change.', 'Let us plan a six-month follow-up, sooner if symptoms change.']
+    ],
+    es: [
+      ['Physician', 'Buenos días. ¿Cómo se ha sentido desde que cambiamos la dosis del medicamento?', 'Good morning. How have you been feeling since the medication dose was changed?'],
+      ['Patient', 'Mi presión está un poco mejor, pero he tenido mareos algunas veces, sobre todo cuando me levanto.', 'My blood pressure is a little better, but I have had some dizziness a few times, mostly when I stand up.'],
+      ['Physician', '¿Ha tenido desmayos, dolor de pecho o falta de aire?', 'Any fainting, chest pain, or shortness of breath?'],
+      ['Patient', 'No. Envié dos mensajes sobre los mareos, pero por lo demás he estado bien.', 'No. I sent two messages about the dizziness, but otherwise I have been okay.'],
+      ['Physician', 'Veo que completó la consulta de cardiología. El panel metabólico de seguimiento todavía está pendiente.', 'I see the cardiology visit was completed. The follow-up metabolic panel is still outstanding.'],
+      ['Patient', 'Está bien. ¿Cuándo debo regresar?', 'Okay. When should I come back?'],
+      ['Physician', 'Planeemos una visita de seguimiento en seis meses, antes si cambian los síntomas.', 'Let us plan a six-month follow-up, sooner if symptoms change.']
+    ],
+    fa: [
+      ['Physician', 'صبح بخیر. از وقتی دوز دارو تغییر کرده چه احساسی داشته‌اید؟', 'Good morning. How have you been feeling since the medication dose was changed?'],
+      ['Patient', 'فشار خونم کمی بهتر شده، اما چند بار سرگیجه داشتم، بیشتر وقتی بلند می‌شوم.', 'My blood pressure is a little better, but I have had some dizziness a few times, mostly when I stand up.'],
+      ['Physician', 'غش، درد قفسه سینه یا تنگی نفس داشته‌اید؟', 'Any fainting, chest pain, or shortness of breath?'],
+      ['Patient', 'نه. دو پیام درباره سرگیجه فرستادم، ولی در غیر این صورت خوب بوده‌ام.', 'No. I sent two messages about the dizziness, but otherwise I have been okay.'],
+      ['Physician', 'می‌بینم که ویزیت قلب انجام شده است. آزمایش متابولیک پیگیری هنوز انجام نشده.', 'I see the cardiology visit was completed. The follow-up metabolic panel is still outstanding.'],
+      ['Patient', 'باشه. چه زمانی باید برگردم؟', 'Okay. When should I come back?'],
+      ['Physician', 'یک پیگیری شش‌ماهه برنامه‌ریزی کنیم، مگر اینکه علائم زودتر تغییر کنند.', 'Let us plan a six-month follow-up, sooner if symptoms change.']
+    ],
+    fr: [
+      ['Physician', 'Bonjour. Comment vous sentez-vous depuis le changement de dose du médicament ?', 'Good morning. How have you been feeling since the medication dose was changed?'],
+      ['Patient', 'Ma tension est un peu meilleure, mais j’ai eu quelques étourdissements, surtout quand je me lève.', 'My blood pressure is a little better, but I have had some dizziness a few times, mostly when I stand up.'],
+      ['Physician', 'Avez-vous eu un évanouissement, une douleur thoracique ou un essoufflement ?', 'Any fainting, chest pain, or shortness of breath?'],
+      ['Patient', 'Non. J’ai envoyé deux messages au sujet des étourdissements, mais sinon ça va.', 'No. I sent two messages about the dizziness, but otherwise I have been okay.'],
+      ['Physician', 'Je vois que la consultation de cardiologie est terminée. Le bilan métabolique de suivi reste à faire.', 'I see the cardiology visit was completed. The follow-up metabolic panel is still outstanding.'],
+      ['Patient', 'D’accord. Quand dois-je revenir ?', 'Okay. When should I come back?'],
+      ['Physician', 'Planifions un suivi dans six mois, plus tôt si les symptômes changent.', 'Let us plan a six-month follow-up, sooner if symptoms change.']
+    ],
+    ar: [
+      ['Physician', 'صباح الخير. كيف شعرت منذ تغيير جرعة الدواء؟', 'Good morning. How have you been feeling since the medication dose was changed?'],
+      ['Patient', 'ضغط الدم أفضل قليلاً، لكن شعرت بالدوخة عدة مرات، خاصة عند الوقوف.', 'My blood pressure is a little better, but I have had some dizziness a few times, mostly when I stand up.'],
+      ['Physician', 'هل حدث إغماء أو ألم في الصدر أو ضيق في التنفس؟', 'Any fainting, chest pain, or shortness of breath?'],
+      ['Patient', 'لا. أرسلت رسالتين عن الدوخة، وبخلاف ذلك كنت بخير.', 'No. I sent two messages about the dizziness, but otherwise I have been okay.'],
+      ['Physician', 'أرى أن زيارة القلب اكتملت. فحص الأيض للمتابعة ما زال غير مكتمل.', 'I see the cardiology visit was completed. The follow-up metabolic panel is still outstanding.'],
+      ['Patient', 'حسنًا. متى يجب أن أعود؟', 'Okay. When should I come back?'],
+      ['Physician', 'لنخطط لمتابعة بعد ستة أشهر، أو أبكر إذا تغيرت الأعراض.', 'Let us plan a six-month follow-up, sooner if symptoms change.']
+    ]
+  };
+  let encounterLines = encounterScripts.en;
   let encounterTimer=null, encounterIndex=0, encounterRunning=false;
   document.getElementById('startEncounterTop').onclick = () => { showPanel('encounter'); startEncounter(); };
   function startEncounter(){
     if(encounterRunning) return stopEncounter();
     if(encounterIndex>=encounterLines.length) resetEncounter();
+    const lang = document.getElementById('encounterLanguage').value;
+    encounterLines = encounterScripts[lang] || encounterScripts.en;
     encounterRunning=true;
     const btn=document.getElementById('encounterToggle');
     btn.textContent='■ End Encounter'; btn.classList.remove('bg-cyan-600'); btn.classList.add('bg-rose-600');
     document.getElementById('liveBadge').textContent='Listening';
     document.getElementById('liveBadge').className='text-xs px-2 py-1 rounded-full bg-rose-100 text-rose-700';
-    document.getElementById('encounterStatus').innerHTML='<strong>Encounter in progress.</strong> Simulated transcript is being converted into a draft note. No microphone or audio recording is used.';
+    const langLabel = document.getElementById('encounterLanguage').selectedOptions[0].text;
+    document.getElementById('encounterStatus').innerHTML=`<strong>Encounter in progress.</strong> Simulating speech recognition in ${langLabel}, translation, and draft-note generation. No microphone or audio recording is used.`;
     if(encounterIndex===0) document.getElementById('transcript').innerHTML='';
     encounterTimer=setInterval(()=>{
       if(encounterIndex>=encounterLines.length){ stopEncounter(true); return; }
-      const [who,text]=encounterLines[encounterIndex++];
-      document.getElementById('transcript').innerHTML += `<div><span class="font-medium text-slate-900">${who}:</span> ${text}</div>`;
+      const [who,original,english]=encounterLines[encounterIndex++];
+      const view = document.getElementById('transcriptView').value;
+      let rendered = original;
+      if(view==='english') rendered = english;
+      if(view==='bilingual') rendered = `${original}<div class="text-xs text-slate-400 mt-1">English: ${english}</div>`;
+      document.getElementById('transcript').innerHTML += `<div><span class="font-medium text-slate-900">${who}:</span> ${rendered}</div>`;
       document.getElementById('transcript').scrollTop=9999;
       updateEncounterAI();
     },900);
@@ -489,7 +562,7 @@
   function updateEncounterAI(){
     if(encounterIndex>=2) document.getElementById('clinicalPoints').innerHTML='<div class="rounded-lg bg-amber-50 p-3"><strong>Symptom mentioned:</strong> intermittent dizziness after medication dose change.</div><div class="rounded-lg bg-slate-50 p-3"><strong>Trend:</strong> patient reports some BP improvement.</div>';
     if(encounterIndex>=5) document.getElementById('clinicalPoints').innerHTML += '<div class="rounded-lg bg-rose-50 p-3"><strong>Outstanding:</strong> follow-up metabolic panel.</div><div class="rounded-lg bg-emerald-50 p-3"><strong>Completed:</strong> cardiology consultation.</div><div class="rounded-lg bg-violet-50 p-3"><strong>Workflow mention:</strong> six-month follow-up discussed.</div>';
-    if(encounterIndex>=7) document.getElementById('draftNote').innerHTML='<div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">HPI</div><p class="mt-1 text-slate-600">Follow-up after antihypertensive dose adjustment. Patient reports improved blood pressure with intermittent positional dizziness. Denies fainting, chest pain, or shortness of breath in this fictional encounter.</p></div><div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">Assessment Context</div><p class="mt-1 text-slate-600">Medication tolerance requires clinician review. Cardiology consultation completed. Follow-up metabolic panel remains outstanding.</p></div><div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">Plan — Draft</div><p class="mt-1 text-slate-600">Complete ordered lab work, continue home BP tracking, generate patient-friendly summary, and schedule six-month follow-up. Final plan requires physician verification and editing.</p></div>';
+    if(encounterIndex>=7) document.getElementById('draftNote').innerHTML='<div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">HPI</div><p class="mt-1 text-slate-600">Follow-up after antihypertensive dose adjustment. Patient reports improved blood pressure with intermittent positional dizziness. Denies fainting, chest pain, or shortness of breath in this fictional encounter.</p></div><div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">Assessment Context</div><p class="mt-1 text-slate-600">Medication tolerance requires clinician review. Cardiology consultation completed. Follow-up metabolic panel remains outstanding.</p></div><div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">Plan — Draft</div><p class="mt-1 text-slate-600">Complete ordered lab work, continue home BP tracking, generate patient-friendly summary, and schedule six-month follow-up. Final plan requires physician verification and editing.</p></div><div class="rounded-xl bg-blue-50 p-3"><div class="text-xs text-blue-500 uppercase tracking-wide">Language Handling</div><p class="mt-1 text-slate-600">Original-language transcript preserved. English clinical note generated for physician review. Production version could support bilingual documentation and configurable note language.</p></div>';
   }
   function resetEncounter(){
     clearInterval(encounterTimer); encounterRunning=false; encounterIndex=0;
