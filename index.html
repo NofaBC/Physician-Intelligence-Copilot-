@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Physician Intelligence Copilot — Prototype</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          boxShadow: { soft: '0 10px 30px rgba(15,23,42,.08)' }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+  <div class="min-h-screen flex">
+    <aside class="w-72 bg-slate-950 text-white p-6 hidden lg:flex lg:flex-col">
+      <div class="mb-8">
+        <div class="text-xs uppercase tracking-[0.25em] text-cyan-300">NOFA AI Factory™</div>
+        <h1 class="mt-2 text-xl font-semibold">Physician Intelligence Copilot™</h1>
+        <p class="mt-2 text-sm text-slate-400">Concept prototype for clinical workflow intelligence</p>
+      </div>
+      <nav class="space-y-2 text-sm">
+        <button data-tab="brief" class="tab-btn w-full text-left px-3 py-2 rounded-lg bg-white/10">Pre-Visit Brief</button>
+        <button data-tab="timeline" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Longitudinal Timeline</button>
+        <button data-tab="changes" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">What Changed?</button>
+        <button data-tab="results" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Results Intelligence</button>
+        <button data-tab="care" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Care Gaps</button>
+        <button data-tab="inbox" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Inbox Intelligence</button>
+        <button data-tab="encounter" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Start Encounter</button>
+        <button data-tab="checker" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Orders & Follow-Up Checker</button>
+        <button data-tab="after" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">After-Visit Orchestrator</button>
+      </nav>
+      <div class="mt-auto rounded-xl border border-amber-400/30 bg-amber-400/10 p-4 text-xs text-amber-100 leading-relaxed">
+        Prototype only. Uses fictional data. Supports clinician review and workflow organization; it does not diagnose, prescribe, or replace clinical judgment.
+      </div>
+    </aside>
+
+    <main class="flex-1 p-4 md:p-8">
+      <header class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 mb-6">
+        <div>
+          <p class="text-sm text-slate-500">Tomorrow's concept demonstration</p>
+          <h2 class="text-2xl md:text-3xl font-semibold">One patient. The relevant story in seconds.</h2>
+        </div>
+        <div class="flex gap-2 flex-wrap items-center">
+          <button id="startEncounterTop" class="px-4 py-2 rounded-xl bg-cyan-600 text-white text-sm font-medium shadow-soft hover:bg-cyan-700">● Start Encounter</button>
+          <span class="px-3 py-1 rounded-full bg-violet-100 text-violet-700 text-xs font-medium">3 new modules added</span>
+          <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium">Fictional patient data</span>
+          <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">Human review required</span>
+        </div>
+      </header>
+
+      <section class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-full bg-slate-200 grid place-items-center font-semibold text-slate-600">JS</div>
+              <div>
+                <h3 class="font-semibold text-lg">Jordan Smith</h3>
+                <p class="text-sm text-slate-500">67 years • Fictional Demo Patient • Primary care follow-up</p>
+              </div>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-center">
+            <div class="bg-slate-50 rounded-xl p-3"><div class="text-xl font-semibold">3</div><div class="text-xs text-slate-500">Active conditions</div></div>
+            <div class="bg-slate-50 rounded-xl p-3"><div class="text-xl font-semibold">3</div><div class="text-xs text-slate-500">Recent changes</div></div>
+            <div class="bg-violet-50 rounded-xl p-3"><div class="text-xl font-semibold text-violet-700">3</div><div class="text-xs text-violet-700">Result insights</div></div>
+            <div class="bg-amber-50 rounded-xl p-3"><div class="text-xl font-semibold text-amber-700">2</div><div class="text-xs text-amber-700">Items to review</div></div>
+            <div class="bg-rose-50 rounded-xl p-3"><div class="text-xl font-semibold text-rose-700">2</div><div class="text-xs text-rose-700">Outstanding tasks</div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="brief" class="tab-panel">
+        <div class="grid xl:grid-cols-3 gap-5">
+          <div class="xl:col-span-2 bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+              <h3 class="font-semibold text-lg">30-Second Patient Intelligence Brief</h3>
+              <div class="flex gap-2 flex-wrap">
+                <button id="refreshBrief" class="px-3 py-2 rounded-lg bg-slate-950 text-white text-xs">Generate brief</button>
+                <button id="jumpChanges" class="px-3 py-2 rounded-lg border border-slate-300 text-xs">Open “What Changed?”</button>
+                <button id="jumpResults" class="px-3 py-2 rounded-lg border border-slate-300 text-xs">Open Results Intelligence</button>
+              </div>
+            </div>
+            <div id="briefContent" class="space-y-4 text-sm leading-relaxed">
+              <div class="rounded-xl bg-blue-50 border border-blue-100 p-4"><strong>Reason for visit:</strong> Primary care follow-up after medication adjustment and recent cardiology consultation.</div>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="rounded-xl bg-slate-50 p-4"><div class="font-medium mb-2">What changed since last visit</div><ul class="list-disc ml-5 space-y-1 text-slate-600"><li>Antihypertensive dose changed 6 weeks ago.</li><li>Cardiology consultation completed.</li><li>Two portal messages reported intermittent dizziness.</li></ul></div>
+                <div class="rounded-xl bg-slate-50 p-4"><div class="font-medium mb-2">What may need attention</div><ul class="list-disc ml-5 space-y-1 text-slate-600"><li>One follow-up lab remains incomplete.</li><li>Recent BP readings remain above prior baseline.</li><li>Medication tolerance should be reviewed.</li></ul></div>
+              </div>
+              <div class="grid md:grid-cols-3 gap-4">
+                <div class="rounded-xl border border-violet-200 bg-violet-50 p-4"><div class="font-medium mb-1">Results highlight</div><p class="text-slate-600">BP trend improved after the dose change, while metabolic monitoring is still pending.</p></div>
+                <div class="rounded-xl border border-amber-200 bg-amber-50 p-4"><div class="font-medium mb-1">Workflow risk</div><p class="text-slate-600">Six-month follow-up is part of the plan but has not been scheduled in this fictional chart.</p></div>
+                <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4"><div class="font-medium mb-1">Completed</div><p class="text-slate-600">Cardiology consultation and medication reconciliation are completed.</p></div>
+              </div>
+              <div class="rounded-xl border border-slate-200 p-4"><div class="font-medium mb-2">Suggested discussion checklist</div><div class="flex gap-2 flex-wrap"><span class="chip">Dizziness</span><span class="chip">Medication change</span><span class="chip">BP trend</span><span class="chip">Outstanding lab</span><span class="chip">Follow-up scheduling</span></div></div>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+            <h3 class="font-semibold text-lg mb-3">Ask the Chart</h3>
+            <div id="chat" class="space-y-3 h-72 overflow-y-auto text-sm mb-3">
+              <div class="bg-slate-100 rounded-xl p-3">Try: “What changed since the last visit?”, “Summarize the results”, or “Run the follow-up checker.”</div>
+            </div>
+            <div class="flex gap-2">
+              <input id="question" class="flex-1 border border-slate-300 rounded-xl px-3 py-2 text-sm" placeholder="Ask about this patient..." />
+              <button id="askBtn" class="px-4 py-2 rounded-xl bg-cyan-600 text-white text-sm">Ask</button>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-2">Prototype responses are pre-scripted from fictional chart data.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="timeline" class="tab-panel hidden">
+        <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+          <h3 class="font-semibold text-lg mb-5">Longitudinal Record Intelligence</h3>
+          <div class="space-y-5 border-l-2 border-slate-200 ml-3 pl-6">
+            <div><div class="text-xs text-slate-400">JUL 2026</div><div class="font-medium">Portal messages: intermittent dizziness</div><p class="text-sm text-slate-600">Two patient messages following medication adjustment. No emergency symptoms documented in this fictional demo.</p></div>
+            <div><div class="text-xs text-slate-400">JUN 2026</div><div class="font-medium">Medication dose changed</div><p class="text-sm text-slate-600">Dose adjusted after repeated elevated home BP readings.</p></div>
+            <div><div class="text-xs text-slate-400">MAY 2026</div><div class="font-medium">Primary care visit</div><p class="text-sm text-slate-600">Follow-up plan included lab testing and cardiology referral.</p></div>
+            <div><div class="text-xs text-slate-400">APR 2026</div><div class="font-medium">Baseline trend identified</div><p class="text-sm text-slate-600">Blood pressure readings began trending above prior 12-month range.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="changes" class="tab-panel hidden">
+        <div class="grid xl:grid-cols-3 gap-5">
+          <div class="xl:col-span-2 bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+              <div>
+                <h3 class="font-semibold text-lg">What Changed Since the Last Visit?</h3>
+                <p class="text-sm text-slate-500">Focused comparison layer for busy physicians.</p>
+              </div>
+              <button id="runCompare" class="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-medium">Run comparison</button>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4 text-sm">
+              <div class="rounded-xl border border-slate-200 p-4">
+                <div class="text-xs uppercase tracking-wide text-slate-400 mb-2">Medication</div>
+                <div class="font-medium">Lisinopril dose adjustment</div>
+                <p class="text-slate-600 mt-1">Dose changed in June after home BP readings trended above baseline.</p>
+              </div>
+              <div class="rounded-xl border border-slate-200 p-4">
+                <div class="text-xs uppercase tracking-wide text-slate-400 mb-2">Specialist care</div>
+                <div class="font-medium">Cardiology consultation completed</div>
+                <p class="text-slate-600 mt-1">Visit completed and reconciled into the chart summary.</p>
+              </div>
+              <div class="rounded-xl border border-slate-200 p-4">
+                <div class="text-xs uppercase tracking-wide text-slate-400 mb-2">Patient-reported updates</div>
+                <div class="font-medium">Two portal messages about dizziness</div>
+                <p class="text-slate-600 mt-1">Symptoms reported after medication change. Escalated for clinician review.</p>
+              </div>
+              <div class="rounded-xl border border-slate-200 p-4">
+                <div class="text-xs uppercase tracking-wide text-slate-400 mb-2">Outstanding tasks</div>
+                <div class="font-medium">Follow-up metabolic panel not completed</div>
+                <p class="text-slate-600 mt-1">Ordered previously, but no completed result is present in this fictional chart.</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+            <h3 class="font-semibold text-lg mb-3">AI Comparison Summary</h3>
+            <div id="compareSummary" class="rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
+              Click <strong>Run comparison</strong> to generate a concise physician-facing summary.
+            </div>
+            <div class="mt-4 space-y-3 text-sm">
+              <div class="rounded-xl bg-amber-50 p-3"><strong>Most clinically relevant change:</strong> dizziness reported after medication dose adjustment.</div>
+              <div class="rounded-xl bg-violet-50 p-3"><strong>Most operationally relevant change:</strong> follow-up lab remains incomplete.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="results" class="tab-panel hidden">
+        <div class="grid xl:grid-cols-3 gap-5">
+          <div class="xl:col-span-2 bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+              <div>
+                <h3 class="font-semibold text-lg">Results Intelligence</h3>
+                <p class="text-sm text-slate-500">Trend interpretation support — still subject to clinician judgment.</p>
+              </div>
+              <button id="summarizeResults" class="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-medium">Summarize results</button>
+            </div>
+            <div class="space-y-4">
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <div class="font-medium">Blood Pressure Trend</div>
+                    <p class="text-sm text-slate-500">Home readings over recent months</p>
+                  </div>
+                  <span class="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">Improved, still above baseline</span>
+                </div>
+                <div class="grid grid-cols-4 gap-3 mt-4 text-center text-xs text-slate-500">
+                  <div><div class="h-20 rounded-lg bg-slate-100 flex items-end justify-center overflow-hidden"><div class="w-8 rounded-t bg-slate-300" style="height:58%"></div></div><div class="mt-2">Apr<br><span class="text-slate-700">138/84</span></div></div>
+                  <div><div class="h-20 rounded-lg bg-slate-100 flex items-end justify-center overflow-hidden"><div class="w-8 rounded-t bg-slate-400" style="height:68%"></div></div><div class="mt-2">May<br><span class="text-slate-700">142/86</span></div></div>
+                  <div><div class="h-20 rounded-lg bg-slate-100 flex items-end justify-center overflow-hidden"><div class="w-8 rounded-t bg-slate-500" style="height:74%"></div></div><div class="mt-2">Jun<br><span class="text-slate-700">146/88</span></div></div>
+                  <div><div class="h-20 rounded-lg bg-slate-100 flex items-end justify-center overflow-hidden"><div class="w-8 rounded-t bg-cyan-500" style="height:60%"></div></div><div class="mt-2">Jul<br><span class="text-slate-700">138/82</span></div></div>
+                </div>
+              </div>
+
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="rounded-2xl border border-slate-200 p-4">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <div class="font-medium">Creatinine</div>
+                      <p class="text-sm text-slate-500">Most recent completed values</p>
+                    </div>
+                    <span class="text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">Stable</span>
+                  </div>
+                  <ul class="mt-3 space-y-2 text-sm text-slate-600">
+                    <li>Mar: 1.0 mg/dL</li>
+                    <li>May: 1.0 mg/dL</li>
+                    <li>Jun: 1.1 mg/dL</li>
+                  </ul>
+                </div>
+                <div class="rounded-2xl border border-slate-200 p-4">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <div class="font-medium">Potassium</div>
+                      <p class="text-sm text-slate-500">Medication-monitoring context</p>
+                    </div>
+                    <span class="text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">Within expected range</span>
+                  </div>
+                  <ul class="mt-3 space-y-2 text-sm text-slate-600">
+                    <li>Mar: 4.2 mmol/L</li>
+                    <li>May: 4.3 mmol/L</li>
+                    <li>Jun: 4.4 mmol/L</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+            <h3 class="font-semibold text-lg mb-3">AI Results Summary</h3>
+            <div id="resultsSummary" class="rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
+              Click <strong>Summarize results</strong> to produce a concise trend narrative.
+            </div>
+            <div class="mt-4 space-y-3 text-sm">
+              <div class="rounded-xl bg-violet-50 p-3"><strong>Useful prompt:</strong> “Show me abnormal or changed trends over the last 12 months.”</div>
+              <div class="rounded-xl bg-amber-50 p-3"><strong>Workflow note:</strong> metabolic monitoring is still pending despite the medication change.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="care" class="tab-panel hidden">
+        <div class="grid md:grid-cols-3 gap-5">
+          <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5"><div class="text-sm text-emerald-700 font-medium mb-3">Completed</div><ul class="space-y-3 text-sm"><li>✓ Cardiology consultation</li><li>✓ Medication reconciliation</li><li>✓ Home BP review</li></ul></div>
+          <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5"><div class="text-sm text-rose-700 font-medium mb-3">Outstanding</div><ul class="space-y-3 text-sm"><li>○ Follow-up metabolic panel</li><li>○ Six-month follow-up scheduling</li></ul></div>
+          <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5"><div class="text-sm text-amber-700 font-medium mb-3">Review</div><ul class="space-y-3 text-sm"><li>! Persistent BP trend</li><li>! Dizziness after medication change</li></ul></div>
+        </div>
+      </section>
+
+      <section id="inbox" class="tab-panel hidden">
+        <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+          <h3 class="font-semibold text-lg mb-4">Physician Inbox Intelligence</h3>
+          <div class="grid md:grid-cols-4 gap-3 mb-5">
+            <div class="rounded-xl bg-rose-50 p-4"><div class="text-2xl font-semibold text-rose-700">7</div><div class="text-xs text-rose-700">Needs physician decision</div></div>
+            <div class="rounded-xl bg-amber-50 p-4"><div class="text-2xl font-semibold text-amber-700">14</div><div class="text-xs text-amber-700">Needs review</div></div>
+            <div class="rounded-xl bg-emerald-50 p-4"><div class="text-2xl font-semibold text-emerald-700">28</div><div class="text-xs text-emerald-700">Routine / delegatable</div></div>
+            <div class="rounded-xl bg-slate-100 p-4"><div class="text-2xl font-semibold">19</div><div class="text-xs text-slate-600">Informational</div></div>
+          </div>
+          <div class="divide-y divide-slate-100 text-sm">
+            <div class="py-4 flex justify-between gap-4"><div><div class="font-medium">Patient message + medication context</div><div class="text-slate-500">AI summary: dizziness reported twice after recent dose change; latest BP log attached.</div></div><span class="text-rose-600 text-xs whitespace-nowrap">Decision</span></div>
+            <div class="py-4 flex justify-between gap-4"><div><div class="font-medium">Lab result bundle</div><div class="text-slate-500">AI summary: 11 results normal-range, 1 requires physician review based on local workflow.</div></div><span class="text-amber-600 text-xs whitespace-nowrap">Review</span></div>
+            <div class="py-4 flex justify-between gap-4"><div><div class="font-medium">Routine refill request</div><div class="text-slate-500">AI prepared context and routing recommendation for clinician approval.</div></div><span class="text-emerald-600 text-xs whitespace-nowrap">Routine</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="encounter" class="tab-panel hidden">
+        <div class="grid xl:grid-cols-3 gap-5">
+          <div class="xl:col-span-2 bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+              <div>
+                <h3 class="font-semibold text-lg">Encounter Note Assistant</h3>
+                <p class="text-sm text-slate-500">Ambient note-taking simulation with clinician review required.</p>
+              </div>
+              <div class="flex gap-2">
+                <button id="encounterToggle" class="px-4 py-2 rounded-xl bg-cyan-600 text-white text-sm font-medium">● Start Encounter</button>
+                <button id="clearEncounter" class="px-4 py-2 rounded-xl border border-slate-300 text-sm">Reset</button>
+              </div>
+            </div>
+            <div id="encounterStatus" class="rounded-xl border border-slate-200 bg-slate-50 p-4 mb-4 text-sm text-slate-600">Ready. No audio is recorded in this prototype.</div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="rounded-xl border border-slate-200 p-4">
+                <div class="flex items-center justify-between mb-3"><div class="font-medium">Live Transcript</div><span id="liveBadge" class="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-500">Idle</span></div>
+                <div id="transcript" class="h-64 overflow-y-auto text-sm space-y-3 text-slate-600">
+                  <p class="text-slate-400">Start the encounter to simulate ambient transcription.</p>
+                </div>
+              </div>
+              <div class="rounded-xl border border-slate-200 p-4">
+                <div class="font-medium mb-3">Extracted Clinical Points</div>
+                <div id="clinicalPoints" class="space-y-3 text-sm">
+                  <div class="text-slate-400">Key points will appear as the encounter progresses.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+            <h3 class="font-semibold text-lg mb-3">Draft Note</h3>
+            <div id="draftNote" class="space-y-3 text-sm">
+              <div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">HPI</div><p class="mt-1 text-slate-500">Pending encounter...</p></div>
+              <div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">Assessment Context</div><p class="mt-1 text-slate-500">Pending clinician review...</p></div>
+              <div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">Plan</div><p class="mt-1 text-slate-500">Pending encounter...</p></div>
+            </div>
+            <button id="approveNote" disabled class="mt-4 w-full px-4 py-2 rounded-xl bg-slate-200 text-slate-500 text-sm font-medium cursor-not-allowed">Review & Approve Draft</button>
+            <p class="text-[11px] text-slate-400 mt-2">Approval is simulated. Production use would require EHR integration, consent, security, auditability, and clinical governance.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="checker" class="tab-panel hidden">
+        <div class="grid xl:grid-cols-3 gap-5">
+          <div class="xl:col-span-2 bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+              <div>
+                <h3 class="font-semibold text-lg">Orders & Follow-Up Checker</h3>
+                <p class="text-sm text-slate-500">Reconciles the draft plan with chart workflows and open tasks.</p>
+              </div>
+              <button id="runChecker" class="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-medium">Run checker</button>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4 text-sm">
+              <div class="rounded-xl border border-slate-200 p-4">
+                <div class="font-medium mb-3">Detected from encounter / draft</div>
+                <ul class="space-y-2 text-slate-600">
+                  <li>• Complete follow-up metabolic panel</li>
+                  <li>• Continue current medication pending clinician review</li>
+                  <li>• Schedule six-month follow-up</li>
+                  <li>• Generate patient-friendly summary</li>
+                </ul>
+              </div>
+              <div class="rounded-xl border border-slate-200 p-4">
+                <div class="font-medium mb-3">Chart workflow status</div>
+                <ul class="space-y-2 text-slate-600">
+                  <li>• Lab order already exists, result not completed</li>
+                  <li>• Medication plan documented</li>
+                  <li>• Follow-up scheduling not initiated</li>
+                  <li>• Patient summary not generated</li>
+                </ul>
+              </div>
+            </div>
+            <div id="checkerOutput" class="mt-4 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
+              Click <strong>Run checker</strong> to identify missing or incomplete workflow actions.
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+            <h3 class="font-semibold text-lg mb-3">Reconciliation Output</h3>
+            <div id="reconCards" class="space-y-3 text-sm">
+              <div class="rounded-xl bg-slate-50 p-3">Awaiting checker run...</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="after" class="tab-panel hidden">
+        <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+          <h3 class="font-semibold text-lg mb-2">After-Visit Orchestrator</h3>
+          <p class="text-sm text-slate-500 mb-5">Transforms clinician-approved decisions into trackable workflows.</p>
+          <div class="rounded-xl bg-slate-50 border border-slate-200 p-4 text-sm mb-5"><strong>Clinician-approved plan:</strong> “Complete lab work in 3 months, continue current medication pending review, follow up in 6 months.”</div>
+          <div class="grid md:grid-cols-5 gap-3">
+            <button class="workflow rounded-xl border border-slate-200 p-4 text-left hover:border-cyan-400"><div class="font-medium">Lab task</div><div class="text-xs text-slate-500 mt-1">Create due-date workflow</div></button>
+            <button class="workflow rounded-xl border border-slate-200 p-4 text-left hover:border-cyan-400"><div class="font-medium">Medication plan</div><div class="text-xs text-slate-500 mt-1">Document approved instruction</div></button>
+            <button class="workflow rounded-xl border border-slate-200 p-4 text-left hover:border-cyan-400"><div class="font-medium">Follow-up</div><div class="text-xs text-slate-500 mt-1">Open scheduling window</div></button>
+            <button class="workflow rounded-xl border border-slate-200 p-4 text-left hover:border-cyan-400"><div class="font-medium">Patient summary</div><div class="text-xs text-slate-500 mt-1">Generate plain-language recap</div></button>
+            <button class="workflow rounded-xl border border-slate-200 p-4 text-left hover:border-cyan-400"><div class="font-medium">Checker handoff</div><div class="text-xs text-slate-500 mt-1">Send to reconciliation queue</div></button>
+          </div>
+          <div id="workflowStatus" class="mt-5 text-sm text-emerald-700"></div>
+        </div>
+      </section>
+
+      <footer class="mt-8 text-xs text-slate-400 leading-relaxed">
+        Concept prototype by NOFA AI Factory™. Demonstration only. No live Kaiser Permanente systems, Epic records, patient data, or clinical integrations are used. Production deployment would require enterprise security, privacy, governance, auditability, clinical validation, and integration review.
+      </footer>
+    </main>
+  </div>
+
+<script>
+  document.querySelectorAll('.chip').forEach(el => el.classList.add('px-2','py-1','rounded-full','bg-slate-100','text-slate-600','text-xs'));
+
+  const tabs = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.tab-panel');
+  const showPanel = id => {
+    tabs.forEach(b => b.classList.toggle('bg-white/10', b.dataset.tab===id));
+    panels.forEach(p => p.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+  };
+  tabs.forEach(btn => btn.addEventListener('click', () => showPanel(btn.dataset.tab)));
+
+  document.getElementById('jumpChanges').onclick = () => showPanel('changes');
+  document.getElementById('jumpResults').onclick = () => showPanel('results');
+
+  const chat = document.getElementById('chat');
+  const q = document.getElementById('question');
+  const responses = [
+    {keys:['change','last visit'], text:'Since the last visit: the antihypertensive dose changed, cardiology was completed, two dizziness messages were sent, and the planned follow-up lab remains incomplete.'},
+    {keys:['outstanding','follow'], text:'The follow-up metabolic panel remains incomplete, and the six-month follow-up has not yet been scheduled in this fictional chart.'},
+    {keys:['blood','bp','pressure'], text:'The fictional chart shows BP readings trending above the prior baseline in spring, with improvement after the June dose adjustment.'},
+    {keys:['result','lab','trend'], text:'Results Intelligence summary: blood pressure improved after the dose change, creatinine appears stable, potassium is within expected range, and the follow-up metabolic panel is still pending.'},
+    {keys:['cardio'], text:'The cardiology consultation was completed. The prototype would link the summary back to the source note in a production environment.'},
+    {keys:['dizz'], text:'Two portal messages mention intermittent dizziness after the medication change. The prototype flags this for clinician review rather than interpreting the symptom.'},
+    {keys:['checker','order'], text:'The Orders & Follow-Up Checker would flag that the lab order exists but is incomplete, the six-month follow-up is mentioned but not scheduled, and the patient summary has not been generated.'}
+  ];
+  function ask(){
+    const text = q.value.trim(); if(!text) return;
+    chat.innerHTML += `<div class="bg-cyan-50 rounded-xl p-3 ml-6"><strong>You:</strong> ${text}</div>`;
+    const lower = text.toLowerCase();
+    let reply = 'I can summarize changes, results trends, outstanding follow-ups, BP trends, cardiology notes, dizziness messages, or the follow-up checker in this fictional chart.';
+    for (const r of responses) if (r.keys.some(k => lower.includes(k))) { reply = r.text; break; }
+    chat.innerHTML += `<div class="bg-slate-100 rounded-xl p-3 mr-6"><strong>Copilot:</strong> ${reply}</div>`;
+    q.value=''; chat.scrollTop = chat.scrollHeight;
+  }
+  document.getElementById('askBtn').onclick = ask;
+  q.addEventListener('keydown', e => { if(e.key==='Enter') ask(); });
+
+  document.getElementById('refreshBrief').onclick = () => {
+    const btn = document.getElementById('refreshBrief');
+    btn.textContent = 'Brief generated ✓'; btn.classList.remove('bg-slate-950'); btn.classList.add('bg-emerald-600');
+    setTimeout(()=>{ btn.textContent='Generate brief'; btn.classList.remove('bg-emerald-600'); btn.classList.add('bg-slate-950'); }, 1800);
+  };
+
+  document.getElementById('runCompare').onclick = () => {
+    const out = document.getElementById('compareSummary');
+    out.innerHTML = '<strong>AI comparison summary:</strong> Since the last visit, the antihypertensive dose was adjusted, cardiology consultation was completed, and the patient reported intermittent dizziness through two portal messages. The most important unresolved item is the follow-up metabolic panel, which remains incomplete.';
+    out.className = 'rounded-xl bg-violet-50 border border-violet-200 p-4 text-sm text-slate-700';
+  };
+
+  document.getElementById('summarizeResults').onclick = () => {
+    const out = document.getElementById('resultsSummary');
+    out.innerHTML = '<strong>AI results summary:</strong> Blood pressure readings rose above the prior baseline in spring and improved after the June dose adjustment, though they remain clinically relevant for review. Available creatinine values are stable and potassium values remain within the expected range. A follow-up metabolic panel is still outstanding.';
+    out.className = 'rounded-xl bg-violet-50 border border-violet-200 p-4 text-sm text-slate-700';
+  };
+
+  document.getElementById('runChecker').onclick = () => {
+    document.getElementById('checkerOutput').innerHTML = '<strong>Checker result:</strong> One order-action mismatch and two incomplete workflows were found. The ordered metabolic panel has not been completed, the six-month follow-up is present in the plan but not scheduled, and a patient-friendly summary has not been generated.';
+    document.getElementById('checkerOutput').className = 'mt-4 rounded-xl bg-violet-50 border border-violet-200 p-4 text-sm text-slate-700';
+    document.getElementById('reconCards').innerHTML = `
+      <div class="rounded-xl bg-emerald-50 p-3"><strong>Matched correctly ✓</strong><div class="text-slate-600 mt-1">Medication plan documented in the chart.</div></div>
+      <div class="rounded-xl bg-amber-50 p-3"><strong>Incomplete workflow !</strong><div class="text-slate-600 mt-1">Metabolic panel order exists, but no completed result is found.</div></div>
+      <div class="rounded-xl bg-rose-50 p-3"><strong>Potential missing action !</strong><div class="text-slate-600 mt-1">Six-month follow-up is mentioned in the plan, but scheduling has not started.</div></div>
+      <div class="rounded-xl bg-slate-100 p-3"><strong>Optional automation</strong><div class="text-slate-600 mt-1">Generate patient-friendly summary for clinician approval.</div></div>
+    `;
+  };
+
+  document.querySelectorAll('.workflow').forEach(btn => btn.addEventListener('click', ()=>{
+    document.getElementById('workflowStatus').textContent = `${btn.querySelector('.font-medium').textContent} queued for clinician review — no action is executed automatically in this prototype.`;
+  }));
+
+  const encounterLines = [
+    ['Physician', 'Good morning. How have you been feeling since the medication dose was changed?'],
+    ['Patient', 'My blood pressure is a little better, but I have had some dizziness a few times, mostly when I stand up.'],
+    ['Physician', 'Any fainting, chest pain, or shortness of breath?'],
+    ['Patient', 'No. I sent two messages about the dizziness, but otherwise I have been okay.'],
+    ['Physician', 'I see the cardiology visit was completed. The follow-up metabolic panel is still outstanding. Let us complete that and keep tracking your home readings.'],
+    ['Patient', 'Okay. When should I come back?'],
+    ['Physician', 'Let us plan a six-month follow-up, sooner if symptoms change.']
+  ];
+  let encounterTimer=null, encounterIndex=0, encounterRunning=false;
+  document.getElementById('startEncounterTop').onclick = () => { showPanel('encounter'); startEncounter(); };
+  function startEncounter(){
+    if(encounterRunning) return stopEncounter();
+    if(encounterIndex>=encounterLines.length) resetEncounter();
+    encounterRunning=true;
+    const btn=document.getElementById('encounterToggle');
+    btn.textContent='■ End Encounter'; btn.classList.remove('bg-cyan-600'); btn.classList.add('bg-rose-600');
+    document.getElementById('liveBadge').textContent='Listening';
+    document.getElementById('liveBadge').className='text-xs px-2 py-1 rounded-full bg-rose-100 text-rose-700';
+    document.getElementById('encounterStatus').innerHTML='<strong>Encounter in progress.</strong> Simulated transcript is being converted into a draft note. No microphone or audio recording is used.';
+    if(encounterIndex===0) document.getElementById('transcript').innerHTML='';
+    encounterTimer=setInterval(()=>{
+      if(encounterIndex>=encounterLines.length){ stopEncounter(true); return; }
+      const [who,text]=encounterLines[encounterIndex++];
+      document.getElementById('transcript').innerHTML += `<div><span class="font-medium text-slate-900">${who}:</span> ${text}</div>`;
+      document.getElementById('transcript').scrollTop=9999;
+      updateEncounterAI();
+    },900);
+  }
+  function stopEncounter(completed=false){
+    encounterRunning=false; clearInterval(encounterTimer);
+    const btn=document.getElementById('encounterToggle');
+    btn.textContent=completed?'Encounter Complete ✓':'● Resume Encounter'; btn.classList.remove('bg-rose-600'); btn.classList.add('bg-cyan-600');
+    document.getElementById('liveBadge').textContent=completed?'Complete':'Paused';
+    document.getElementById('liveBadge').className='text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700';
+    if(completed){
+      document.getElementById('encounterStatus').innerHTML='<strong>Draft ready for physician review.</strong> Nothing is finalized or sent to the medical record automatically. The checker can now reconcile follow-up actions.';
+      const a=document.getElementById('approveNote'); a.disabled=false; a.className='mt-4 w-full px-4 py-2 rounded-xl bg-slate-950 text-white text-sm font-medium';
+    }
+  }
+  function updateEncounterAI(){
+    if(encounterIndex>=2) document.getElementById('clinicalPoints').innerHTML='<div class="rounded-lg bg-amber-50 p-3"><strong>Symptom mentioned:</strong> intermittent dizziness after medication dose change.</div><div class="rounded-lg bg-slate-50 p-3"><strong>Trend:</strong> patient reports some BP improvement.</div>';
+    if(encounterIndex>=5) document.getElementById('clinicalPoints').innerHTML += '<div class="rounded-lg bg-rose-50 p-3"><strong>Outstanding:</strong> follow-up metabolic panel.</div><div class="rounded-lg bg-emerald-50 p-3"><strong>Completed:</strong> cardiology consultation.</div><div class="rounded-lg bg-violet-50 p-3"><strong>Workflow mention:</strong> six-month follow-up discussed.</div>';
+    if(encounterIndex>=7) document.getElementById('draftNote').innerHTML='<div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">HPI</div><p class="mt-1 text-slate-600">Follow-up after antihypertensive dose adjustment. Patient reports improved blood pressure with intermittent positional dizziness. Denies fainting, chest pain, or shortness of breath in this fictional encounter.</p></div><div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">Assessment Context</div><p class="mt-1 text-slate-600">Medication tolerance requires clinician review. Cardiology consultation completed. Follow-up metabolic panel remains outstanding.</p></div><div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">Plan — Draft</div><p class="mt-1 text-slate-600">Complete ordered lab work, continue home BP tracking, generate patient-friendly summary, and schedule six-month follow-up. Final plan requires physician verification and editing.</p></div>';
+  }
+  function resetEncounter(){
+    clearInterval(encounterTimer); encounterRunning=false; encounterIndex=0;
+    document.getElementById('transcript').innerHTML='<p class="text-slate-400">Start the encounter to simulate ambient transcription.</p>';
+    document.getElementById('clinicalPoints').innerHTML='<div class="text-slate-400">Key points will appear as the encounter progresses.</div>';
+    document.getElementById('draftNote').innerHTML='<div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">HPI</div><p class="mt-1 text-slate-500">Pending encounter...</p></div><div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">Assessment Context</div><p class="mt-1 text-slate-500">Pending clinician review...</p></div><div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">Plan</div><p class="mt-1 text-slate-500">Pending encounter...</p></div>';
+    document.getElementById('encounterStatus').textContent='Ready. No audio is recorded in this prototype.';
+    document.getElementById('liveBadge').textContent='Idle'; document.getElementById('liveBadge').className='text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-500';
+    const b=document.getElementById('encounterToggle'); b.textContent='● Start Encounter'; b.className='px-4 py-2 rounded-xl bg-cyan-600 text-white text-sm font-medium';
+    const a=document.getElementById('approveNote'); a.disabled=true; a.textContent='Review & Approve Draft'; a.className='mt-4 w-full px-4 py-2 rounded-xl bg-slate-200 text-slate-500 text-sm font-medium cursor-not-allowed';
+  }
+  document.getElementById('encounterToggle').onclick=startEncounter;
+  document.getElementById('clearEncounter').onclick=resetEncounter;
+  document.getElementById('approveNote').onclick=()=>{ 
+    const a=document.getElementById('approveNote'); 
+    a.textContent='Physician Approved ✓'; 
+    a.className='mt-4 w-full px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium'; 
+    document.getElementById('encounterStatus').innerHTML='<strong>Approved in prototype.</strong> In production, the physician could edit first and explicitly sign before any EHR submission. You can now run the Orders & Follow-Up Checker to reconcile actions.'; 
+  };
+</script>
+</body>
+</html>
