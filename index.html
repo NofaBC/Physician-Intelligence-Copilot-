@@ -82,7 +82,7 @@
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-5">
               <div>
                 <h3 class="font-semibold text-lg">Today’s Patient Schedule</h3>
-                <p class="text-sm text-slate-500">20-minute visits + 5-minute wrap-up / transition • Fictional demo schedule</p>
+                <p class="text-sm text-slate-500">20-minute visits + 5-minute wrap-up / transition • Protected 45-minute lunch • Fictional demo schedule</p>
               </div>
               <div class="flex gap-2 flex-wrap text-xs">
                 <button data-filter="all" class="schedule-filter px-3 py-2 rounded-lg bg-slate-950 text-white">All</button>
@@ -523,12 +523,12 @@
     {time:'11:45 AM', wrap:'12:05–12:10', name:'Omar Haddad', initials:'OH', age:50, visit:'Chronic care follow-up', status:'not-arrived', label:'Not arrived'},
     {time:'12:10 PM', wrap:'12:30–12:35', name:'Linda Evans', initials:'LE', age:68, visit:'Post-hospital follow-up', status:'not-arrived', label:'Not arrived'},
     {time:'12:35 PM', wrap:'12:55–1:00', name:'Carlos Rivera', initials:'CR', age:45, visit:'New concern follow-up', status:'not-arrived', label:'Not arrived'},
-    {time:'1:00 PM', wrap:'1:20–1:25', name:'Grace Kim', initials:'GK', age:57, visit:'Preventive care', status:'not-arrived', label:'Not arrived'},
-    {time:'1:25 PM', wrap:'1:45–1:50', name:'Michael Brown', initials:'MB', age:69, visit:'Medication review', status:'not-arrived', label:'Not arrived'},
-    {time:'1:50 PM', wrap:'2:10–2:15', name:'Nadia Hassan', initials:'NH', age:52, visit:'Lab follow-up', status:'not-arrived', label:'Not arrived'},
-    {time:'2:15 PM', wrap:'2:35–2:40', name:'Thomas Green', initials:'TG', age:61, visit:'Chronic care follow-up', status:'not-arrived', label:'Not arrived'},
-    {time:'2:40 PM', wrap:'3:00–3:05', name:'Mei Lin', initials:'ML', age:48, visit:'Results review', status:'not-arrived', label:'Not arrived'},
-    {time:'3:05 PM', wrap:'3:25–3:30', name:'Samuel Davis', initials:'SD', age:73, visit:'Primary care follow-up', status:'not-arrived', label:'Not arrived'}
+    {time:'1:45 PM', wrap:'2:05–2:10', name:'Grace Kim', initials:'GK', age:57, visit:'Preventive care', status:'not-arrived', label:'Not arrived'},
+    {time:'2:10 PM', wrap:'2:30–2:35', name:'Michael Brown', initials:'MB', age:69, visit:'Medication review', status:'not-arrived', label:'Not arrived'},
+    {time:'2:35 PM', wrap:'2:55–3:00', name:'Nadia Hassan', initials:'NH', age:52, visit:'Lab follow-up', status:'not-arrived', label:'Not arrived'},
+    {time:'3:00 PM', wrap:'3:20–3:25', name:'Thomas Green', initials:'TG', age:61, visit:'Chronic care follow-up', status:'not-arrived', label:'Not arrived'},
+    {time:'3:25 PM', wrap:'3:45–3:50', name:'Mei Lin', initials:'ML', age:48, visit:'Results review', status:'not-arrived', label:'Not arrived'},
+    {time:'3:50 PM', wrap:'4:10–4:15', name:'Samuel Davis', initials:'SD', age:73, visit:'Primary care follow-up', status:'not-arrived', label:'Not arrived'}
   ];
   const statusClass = {
     'completed':'bg-emerald-100 text-emerald-700',
@@ -539,13 +539,17 @@
   function renderSchedule(filter='all'){
     const body=document.getElementById('scheduleBody');
     const items=schedulePatients.filter(p=>filter==='all'||p.status===filter);
-    body.innerHTML=items.map((p,i)=>`<tr class="hover:bg-slate-50 schedule-row" data-status="${p.status}">
+    body.innerHTML=items.map((p,i)=>{
+      const originalIndex=schedulePatients.indexOf(p);
+      const lunch = (filter==='all' && originalIndex===11) ? `<tr class="bg-amber-50 border-y border-amber-200"><td class="py-4 pr-4 text-sm font-semibold text-amber-800 whitespace-nowrap">1:00–1:45 PM</td><td colspan="4" class="py-4 text-sm text-amber-800"><strong>Protected Lunch</strong> — no patient appointments; physician break and reset before afternoon clinic</td></tr>` : '';
+      return `<tr class="hover:bg-slate-50 schedule-row" data-status="${p.status}">
       <td class="py-4 pr-4 font-medium whitespace-nowrap">${p.time}<div class="text-[11px] font-normal text-slate-400 mt-1">20-min visit</div></td>
       <td class="py-4 pr-4"><div class="font-medium">${p.name}</div><div class="text-xs text-slate-400">${p.age} years • Fictional patient</div></td>
       <td class="py-4 pr-4 text-slate-600">${p.visit}</td>
       <td class="py-4 pr-4"><span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass[p.status]}">${p.label}</span></td>
       <td class="py-4 text-right"><button class="open-patient px-3 py-2 rounded-lg border border-slate-300 hover:border-cyan-500 text-xs" data-name="${p.name}">Open Patient</button></td>
-    </tr>${filter==='all' ? `<tr class="bg-violet-50/70"><td class="py-2 pr-4 text-xs font-medium text-violet-700 whitespace-nowrap">${p.wrap}</td><td colspan="4" class="py-2 text-xs text-violet-700"><strong>Wrap-Up / Transition</strong> — review AI note, add private physician note, confirm medications/orders, complete visit, move to next room</td></tr>` : ''}`).join('');
+    </tr>${filter==='all' ? `<tr class="bg-violet-50/70"><td class="py-2 pr-4 text-xs font-medium text-violet-700 whitespace-nowrap">${p.wrap}</td><td colspan="4" class="py-2 text-xs text-violet-700"><strong>Wrap-Up / Transition</strong> — review AI note, add private physician note, confirm medications/orders, complete visit, move to next room</td></tr>` : ''}${lunch}`;
+    }).join('');
     document.querySelectorAll('.open-patient').forEach(btn=>btn.onclick=()=>openPatient(btn.dataset.name));
   }
   function openPatient(name){
