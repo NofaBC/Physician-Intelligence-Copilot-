@@ -156,15 +156,29 @@
             </div>
           </div>
           <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
-            <h3 class="font-semibold text-lg mb-3">Ask the Chart</h3>
-            <div id="chat" class="space-y-3 h-72 overflow-y-auto text-sm mb-3">
-              <div class="bg-slate-100 rounded-xl p-3">Try: “What changed since the last visit?”, “Summarize the results”, or “Run the follow-up checker.”</div>
+            <div class="flex items-center justify-between gap-3 mb-3">
+              <div>
+                <h3 class="font-semibold text-lg">Ask the Chart</h3>
+                <p class="text-xs text-slate-500 mt-1">Voice + text chart intelligence</p>
+              </div>
+              <label class="flex items-center gap-2 text-xs text-slate-600 cursor-pointer select-none">
+                <input id="silentMode" type="checkbox" checked class="rounded border-slate-300" />
+                <span>🔇 Silent Response</span>
+              </label>
             </div>
-            <div class="flex gap-2">
-              <input id="question" class="flex-1 border border-slate-300 rounded-xl px-3 py-2 text-sm" placeholder="Ask about this patient..." />
+            <div id="chat" class="space-y-3 h-72 overflow-y-auto text-sm mb-3">
+              <div class="bg-slate-100 rounded-xl p-3">Try: “What changed since the last visit?”, “Summarize the results”, or tap the microphone and speak.</div>
+            </div>
+            <div class="flex gap-2 items-stretch">
+              <button id="voiceAskBtn" title="Ask by voice" aria-label="Ask the Chart by voice" class="w-12 rounded-xl border border-slate-300 bg-white hover:border-cyan-500 text-lg flex items-center justify-center">🎤</button>
+              <input id="question" class="flex-1 border border-slate-300 rounded-xl px-3 py-2 text-sm" placeholder="Type or tap 🎤 to ask about this patient..." />
               <button id="askBtn" class="px-4 py-2 rounded-xl bg-cyan-600 text-white text-sm">Ask</button>
             </div>
-            <p class="text-[11px] text-slate-400 mt-2">Prototype responses are pre-scripted from fictional chart data.</p>
+            <div class="flex items-center justify-between mt-2 gap-3">
+              <div id="voiceStatus" class="text-[11px] text-slate-400">Microphone ready • browser speech recognition when available</div>
+              <button id="demoVoiceQuestion" class="text-[11px] text-cyan-700 hover:underline">Demo voice question</button>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-2">Prototype responses are pre-scripted from fictional chart data. Silent Response keeps answers on-screen only.</p>
           </div>
         </div>
       </section>
@@ -597,17 +611,79 @@
     {keys:['dizz'], text:'Two portal messages mention intermittent dizziness after the medication change. The prototype flags this for clinician review rather than interpreting the symptom.'},
     {keys:['checker','order'], text:'The Orders & Follow-Up Checker would flag that the lab order exists but is incomplete, the six-month follow-up is mentioned but not scheduled, and the patient summary has not been generated.'}
   ];
-  function ask(){
+  function speakReply(text){
+    const silent = document.getElementById('silentMode')?.checked ?? true;
+    if(silent || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.98;
+    utterance.pitch = 1;
+    window.speechSynthesis.speak(utterance);
+  }
+  function ask(source='text'){
     const text = q.value.trim(); if(!text) return;
-    chat.innerHTML += `<div class="bg-cyan-50 rounded-xl p-3 ml-6"><strong>You:</strong> ${text}</div>`;
+    const sourceLabel = source==='voice' ? '<span class="text-[10px] ml-1 px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-700">voice</span>' : '';
+    chat.innerHTML += `<div class="bg-cyan-50 rounded-xl p-3 ml-6"><strong>You:</strong> ${text} ${sourceLabel}</div>`;
     const lower = text.toLowerCase();
     let reply = 'I can summarize changes, results trends, outstanding follow-ups, BP trends, cardiology notes, dizziness messages, or the follow-up checker in this fictional chart.';
     for (const r of responses) if (r.keys.some(k => lower.includes(k))) { reply = r.text; break; }
-    chat.innerHTML += `<div class="bg-slate-100 rounded-xl p-3 mr-6"><strong>Copilot:</strong> ${reply}</div>`;
+    const responseMode = document.getElementById('silentMode')?.checked ? '<span class="text-[10px] ml-1 px-2 py-0.5 rounded-full bg-slate-200 text-slate-600">silent</span>' : '<span class="text-[10px] ml-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">audio</span>';
+    chat.innerHTML += `<div class="bg-slate-100 rounded-xl p-3 mr-6"><strong>Copilot:</strong> ${reply} ${responseMode}</div>`;
+    speakReply(reply);
     q.value=''; chat.scrollTop = chat.scrollHeight;
   }
-  document.getElementById('askBtn').onclick = ask;
-  q.addEventListener('keydown', e => { if(e.key==='Enter') ask(); });
+  document.getElementById('askBtn').onclick = () => ask('text');
+  q.addEventListener('keydown', e => { if(e.key==='Enter') ask('text'); });
+
+  const voiceAskBtn = document.getElementById('voiceAskBtn');
+  const voiceStatus = document.getElementById('voiceStatus');
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+  if(SpeechRecognition){
+    recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.continuous = false;
+    recognition.onstart = () => {
+      voiceAskBtn.textContent='⏹';
+      voiceAskBtn.classList.add('bg-rose-50','border-rose-300');
+      voiceStatus.textContent='Listening… ask your question about this chart';
+      voiceStatus.className='text-[11px] text-rose-600';
+    };
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      q.value = transcript;
+      voiceStatus.textContent=`Heard: “${transcript}”`;
+      voiceStatus.className='text-[11px] text-emerald-600';
+      setTimeout(()=>ask('voice'),250);
+    };
+    recognition.onerror = () => {
+      voiceStatus.textContent='Voice recognition unavailable — use text or Demo voice question.';
+      voiceStatus.className='text-[11px] text-amber-600';
+    };
+    recognition.onend = () => {
+      voiceAskBtn.textContent='🎤';
+      voiceAskBtn.classList.remove('bg-rose-50','border-rose-300');
+    };
+    voiceAskBtn.onclick = () => {
+      try { recognition.start(); } catch(e) { recognition.stop(); }
+    };
+  } else {
+    voiceStatus.textContent='Browser speech recognition not available — demo mode is ready.';
+    voiceAskBtn.onclick = () => document.getElementById('demoVoiceQuestion').click();
+  }
+  document.getElementById('demoVoiceQuestion').onclick = () => {
+    q.value='What changed since the last visit?';
+    voiceStatus.textContent='Demo voice captured: “What changed since the last visit?”';
+    voiceStatus.className='text-[11px] text-cyan-700';
+    setTimeout(()=>ask('voice'),250);
+  };
+  document.getElementById('silentMode').addEventListener('change', e => {
+    const mode = e.target.checked ? 'Silent Response enabled — answers stay on screen.' : 'Audio Response enabled — Copilot may speak answers aloud.';
+    voiceStatus.textContent=mode;
+    voiceStatus.className=e.target.checked?'text-[11px] text-slate-500':'text-[11px] text-emerald-600';
+    if(e.target.checked && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+  });
 
   document.getElementById('refreshBrief').onclick = () => {
     const btn = document.getElementById('refreshBrief');
