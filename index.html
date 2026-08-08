@@ -26,6 +26,7 @@
       <nav class="space-y-2 text-sm">
         <button data-tab="schedule" class="tab-btn w-full text-left px-3 py-2 rounded-lg bg-white/10">Today’s Patient Schedule</button>
         <button data-tab="brief" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Pre-Visit Brief</button>
+        <button data-tab="meds" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Medications</button>
         <button data-tab="timeline" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Longitudinal Timeline</button>
         <button data-tab="changes" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">What Changed?</button>
         <button data-tab="results" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Results Intelligence</button>
@@ -136,6 +137,7 @@
                 <button id="refreshBrief" class="px-3 py-2 rounded-lg bg-slate-950 text-white text-xs">Generate brief</button>
                 <button id="jumpChanges" class="px-3 py-2 rounded-lg border border-slate-300 text-xs">Open “What Changed?”</button>
                 <button id="jumpResults" class="px-3 py-2 rounded-lg border border-slate-300 text-xs">Open Results Intelligence</button>
+                <button id="jumpMeds" class="px-3 py-2 rounded-lg border border-slate-300 text-xs">Open Medications</button>
               </div>
             </div>
             <div id="briefContent" class="space-y-4 text-sm leading-relaxed">
@@ -162,6 +164,55 @@
               <button id="askBtn" class="px-4 py-2 rounded-xl bg-cyan-600 text-white text-sm">Ask</button>
             </div>
             <p class="text-[11px] text-slate-400 mt-2">Prototype responses are pre-scripted from fictional chart data.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="meds" class="tab-panel hidden">
+        <div class="grid xl:grid-cols-3 gap-5">
+          <div class="xl:col-span-2 bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+              <div>
+                <h3 class="font-semibold text-lg">Medication List</h3>
+                <p class="text-sm text-slate-500">Current and recently changed medications for the active fictional patient.</p>
+              </div>
+              <button id="reconcileMeds" class="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-medium">Run medication reconciliation</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="text-left text-xs uppercase tracking-wide text-slate-400 border-b border-slate-200">
+                  <tr><th class="py-3 pr-4">Medication</th><th class="py-3 pr-4">Dose</th><th class="py-3 pr-4">Frequency</th><th class="py-3 pr-4">Status</th><th class="py-3">Last change</th></tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <tr><td class="py-4 pr-4 font-medium">Lisinopril</td><td class="py-4 pr-4">20 mg</td><td class="py-4 pr-4">Once daily</td><td class="py-4 pr-4"><span class="px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs">Active</span></td><td class="py-4 text-slate-600">Dose increased Jun 2026</td></tr>
+                  <tr><td class="py-4 pr-4 font-medium">Atorvastatin</td><td class="py-4 pr-4">20 mg</td><td class="py-4 pr-4">Nightly</td><td class="py-4 pr-4"><span class="px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs">Active</span></td><td class="py-4 text-slate-600">No recent change</td></tr>
+                  <tr><td class="py-4 pr-4 font-medium">Metformin ER</td><td class="py-4 pr-4">500 mg</td><td class="py-4 pr-4">Twice daily</td><td class="py-4 pr-4"><span class="px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs">Active</span></td><td class="py-4 text-slate-600">No recent change</td></tr>
+                  <tr><td class="py-4 pr-4 font-medium">Hydrochlorothiazide</td><td class="py-4 pr-4">12.5 mg</td><td class="py-4 pr-4">Once daily</td><td class="py-4 pr-4"><span class="px-2 py-1 rounded-full bg-slate-200 text-slate-600 text-xs">Discontinued</span></td><td class="py-4 text-slate-600">Stopped May 2026</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div id="medReconOutput" class="mt-4 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
+              Medication reconciliation has not been run yet.
+            </div>
+          </div>
+          <div class="space-y-5">
+            <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+              <h3 class="font-semibold text-lg mb-3">Medication Intelligence</h3>
+              <div class="space-y-3 text-sm">
+                <div class="rounded-xl bg-amber-50 p-3"><strong>Recent change:</strong><div class="text-slate-600 mt-1">Lisinopril increased to 20 mg daily in June.</div></div>
+                <div class="rounded-xl bg-rose-50 p-3"><strong>Review context:</strong><div class="text-slate-600 mt-1">Intermittent dizziness was reported after the dose change.</div></div>
+                <div class="rounded-xl bg-violet-50 p-3"><strong>Monitoring:</strong><div class="text-slate-600 mt-1">Follow-up metabolic panel remains incomplete.</div></div>
+              </div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+              <h3 class="font-semibold text-lg mb-3">Quick Questions</h3>
+              <div class="space-y-2 text-sm text-slate-600">
+                <div>• What changed recently?</div>
+                <div>• Which medication may relate to the current complaint?</div>
+                <div>• What monitoring is still outstanding?</div>
+                <div>• Which medications were discontinued?</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -528,6 +579,7 @@
 
   document.getElementById('jumpChanges').onclick = () => showPanel('changes');
   document.getElementById('jumpResults').onclick = () => showPanel('results');
+  document.getElementById('jumpMeds').onclick = () => showPanel('meds');
 
   const chat = document.getElementById('chat');
   const q = document.getElementById('question');
@@ -556,6 +608,13 @@
     const btn = document.getElementById('refreshBrief');
     btn.textContent = 'Brief generated ✓'; btn.classList.remove('bg-slate-950'); btn.classList.add('bg-emerald-600');
     setTimeout(()=>{ btn.textContent='Generate brief'; btn.classList.remove('bg-emerald-600'); btn.classList.add('bg-slate-950'); }, 1800);
+  };
+
+  
+  document.getElementById('reconcileMeds').onclick = () => {
+    const out=document.getElementById('medReconOutput');
+    out.innerHTML='<strong>Medication reconciliation summary:</strong> 3 active medications and 1 recently discontinued medication are listed. Lisinopril was increased in June; dizziness was subsequently reported, and the planned metabolic monitoring remains incomplete. Physician review is required before any medication change.';
+    out.className='mt-4 rounded-xl bg-violet-50 border border-violet-200 p-4 text-sm text-slate-700';
   };
 
   document.getElementById('runCompare').onclick = () => {
