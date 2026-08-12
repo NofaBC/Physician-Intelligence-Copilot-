@@ -31,7 +31,7 @@
         <button data-tab="changes" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">What Changed?</button>
         <button data-tab="results" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Results Intelligence</button>
         <button data-tab="care" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Care Gaps</button>
-        <button data-tab="inbox" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Inbox Intelligence</button>
+        <button data-tab="inbox" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Message Center</button>
         <button data-tab="encounter" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Start Encounter</button>
         <button data-tab="diagnostic" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Diagnostic Support</button>
         <button data-tab="checker" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Orders & Follow-Up Checker</button>
@@ -372,18 +372,87 @@
       </section>
 
       <section id="inbox" class="tab-panel hidden">
-        <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
-          <h3 class="font-semibold text-lg mb-4">Physician Inbox Intelligence</h3>
-          <div class="grid md:grid-cols-4 gap-3 mb-5">
-            <div class="rounded-xl bg-rose-50 p-4"><div class="text-2xl font-semibold text-rose-700">7</div><div class="text-xs text-rose-700">Needs physician decision</div></div>
-            <div class="rounded-xl bg-amber-50 p-4"><div class="text-2xl font-semibold text-amber-700">14</div><div class="text-xs text-amber-700">Needs review</div></div>
-            <div class="rounded-xl bg-emerald-50 p-4"><div class="text-2xl font-semibold text-emerald-700">28</div><div class="text-xs text-emerald-700">Routine / delegatable</div></div>
-            <div class="rounded-xl bg-slate-100 p-4"><div class="text-2xl font-semibold">19</div><div class="text-xs text-slate-600">Informational</div></div>
+        <div class="grid xl:grid-cols-3 gap-5">
+          <div class="xl:col-span-2 bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+              <div>
+                <h3 class="font-semibold text-lg">Message Center</h3>
+                <p class="text-sm text-slate-500">AI-organized patient communications, results questions, refills, referrals, and staff-routed messages.</p>
+              </div>
+              <div class="flex gap-2 flex-wrap">
+                <button data-msgfilter="all" class="msg-filter px-3 py-2 rounded-lg bg-slate-950 text-white text-xs">All</button>
+                <button data-msgfilter="decision" class="msg-filter px-3 py-2 rounded-lg border border-slate-300 text-xs">Physician decision</button>
+                <button data-msgfilter="reply" class="msg-filter px-3 py-2 rounded-lg border border-slate-300 text-xs">Needs response</button>
+                <button data-msgfilter="delegate" class="msg-filter px-3 py-2 rounded-lg border border-slate-300 text-xs">Delegatable</button>
+              </div>
+            </div>
+            <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-5">
+              <div class="rounded-xl bg-rose-50 p-4"><div class="text-2xl font-semibold text-rose-700">7</div><div class="text-xs text-rose-700">Needs physician decision</div></div>
+              <div class="rounded-xl bg-amber-50 p-4"><div class="text-2xl font-semibold text-amber-700">9</div><div class="text-xs text-amber-700">Needs response</div></div>
+              <div class="rounded-xl bg-emerald-50 p-4"><div class="text-2xl font-semibold text-emerald-700">12</div><div class="text-xs text-emerald-700">Can delegate</div></div>
+              <div class="rounded-xl bg-slate-100 p-4"><div class="text-2xl font-semibold">19</div><div class="text-xs text-slate-600">Informational</div></div>
+            </div>
+            <div id="messageList" class="space-y-3 text-sm">
+              <article class="msg-card rounded-xl border border-rose-200 bg-rose-50/40 p-4" data-kind="decision reply">
+                <div class="flex justify-between gap-4">
+                  <div>
+                    <div class="flex items-center gap-2 flex-wrap"><span class="font-semibold">Jordan Smith</span><span class="text-xs px-2 py-1 rounded-full bg-rose-100 text-rose-700">Physician decision</span><span class="text-xs text-slate-400">2 new messages</span></div>
+                    <p class="mt-2 text-slate-700"><strong>AI summary:</strong> Reports intermittent dizziness after recent antihypertensive dose change. Latest home BP log attached. No fainting, chest pain, or shortness of breath reported in the thread.</p>
+                    <p class="mt-2 text-xs text-slate-500">Chart link: recent medication change • dizziness messages • pending metabolic panel</p>
+                  </div>
+                  <button class="open-msg shrink-0 px-3 py-2 rounded-lg bg-slate-950 text-white text-xs" data-patient="Jordan Smith">Open thread</button>
+                </div>
+              </article>
+              <article class="msg-card rounded-xl border border-amber-200 bg-amber-50/40 p-4" data-kind="reply">
+                <div class="flex justify-between gap-4">
+                  <div>
+                    <div class="flex items-center gap-2 flex-wrap"><span class="font-semibold">Maria Garcia</span><span class="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">Needs response</span><span class="text-xs text-slate-400">1 new message</span></div>
+                    <p class="mt-2 text-slate-700"><strong>AI summary:</strong> Asks whether fasting is required before tomorrow's lab draw and whether morning medications should be taken as usual.</p>
+                    <p class="mt-2 text-xs text-slate-500">AI can draft a response using approved instructions; clinician reviews before send.</p>
+                  </div>
+                  <button class="open-msg shrink-0 px-3 py-2 rounded-lg border border-slate-300 text-xs" data-patient="Maria Garcia">Open thread</button>
+                </div>
+              </article>
+              <article class="msg-card rounded-xl border border-emerald-200 bg-emerald-50/40 p-4" data-kind="delegate">
+                <div class="flex justify-between gap-4">
+                  <div>
+                    <div class="flex items-center gap-2 flex-wrap"><span class="font-semibold">Robert Lee</span><span class="text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">Delegatable</span><span class="text-xs text-slate-400">Refill request</span></div>
+                    <p class="mt-2 text-slate-700"><strong>AI summary:</strong> Routine refill request. Medication, dose, last fill, allergies, and recent monitoring context are available for staff workflow review.</p>
+                    <p class="mt-2 text-xs text-slate-500">Suggested routing: medication-refill workflow / nurse or MA queue, subject to local policy.</p>
+                  </div>
+                  <button class="delegate-msg shrink-0 px-3 py-2 rounded-lg border border-emerald-300 text-emerald-700 text-xs">Delegate</button>
+                </div>
+              </article>
+              <article class="msg-card rounded-xl border border-slate-200 p-4" data-kind="reply decision">
+                <div class="flex justify-between gap-4">
+                  <div>
+                    <div class="flex items-center gap-2 flex-wrap"><span class="font-semibold">Susan Patel</span><span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">Results question</span><span class="text-xs text-slate-400">1 new message</span></div>
+                    <p class="mt-2 text-slate-700"><strong>AI summary:</strong> Patient asks for an explanation of a recently posted imaging result. Message is linked to the corresponding report for physician review.</p>
+                    <p class="mt-2 text-xs text-slate-500">AI can summarize the report, but physician interpretation and patient response remain clinician-controlled.</p>
+                  </div>
+                  <button class="open-msg shrink-0 px-3 py-2 rounded-lg border border-slate-300 text-xs" data-patient="Susan Patel">Open thread</button>
+                </div>
+              </article>
+            </div>
           </div>
-          <div class="divide-y divide-slate-100 text-sm">
-            <div class="py-4 flex justify-between gap-4"><div><div class="font-medium">Patient message + medication context</div><div class="text-slate-500">AI summary: dizziness reported twice after recent dose change; latest BP log attached.</div></div><span class="text-rose-600 text-xs whitespace-nowrap">Decision</span></div>
-            <div class="py-4 flex justify-between gap-4"><div><div class="font-medium">Lab result bundle</div><div class="text-slate-500">AI summary: 11 results normal-range, 1 requires physician review based on local workflow.</div></div><span class="text-amber-600 text-xs whitespace-nowrap">Review</span></div>
-            <div class="py-4 flex justify-between gap-4"><div><div class="font-medium">Routine refill request</div><div class="text-slate-500">AI prepared context and routing recommendation for clinician approval.</div></div><span class="text-emerald-600 text-xs whitespace-nowrap">Routine</span></div>
+          <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+            <h3 class="font-semibold text-lg mb-3">AI Communication Assistant</h3>
+            <div id="messageAssistant" class="space-y-3 text-sm">
+              <div class="rounded-xl bg-slate-50 p-4">Select a thread to see the AI-organized communication context.</div>
+              <div class="rounded-xl border border-slate-200 p-4">
+                <div class="text-xs uppercase tracking-wide text-slate-400 mb-2">Available actions</div>
+                <ul class="space-y-2 text-slate-600">
+                  <li>• Summarize full thread</li>
+                  <li>• Show relevant chart context</li>
+                  <li>• Draft physician response</li>
+                  <li>• Delegate to staff queue</li>
+                  <li>• Add clinically relevant message to “What Changed?”</li>
+                </ul>
+              </div>
+              <button id="draftMessageReply" class="w-full px-4 py-2 rounded-xl bg-cyan-600 text-white text-sm font-medium">Draft response</button>
+              <button id="markChartRelevant" class="w-full px-4 py-2 rounded-xl border border-slate-300 text-sm font-medium">Add to chart context</button>
+              <p class="text-[11px] text-slate-400">Prototype only. In production, send/delegate actions would require authenticated EHR messaging integration and role-based permissions.</p>
+            </div>
           </div>
         </div>
       </section>
