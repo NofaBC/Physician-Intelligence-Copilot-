@@ -33,11 +33,12 @@
         <button data-tab="care" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Care Gaps</button>
         <button data-tab="inbox" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Inbox Intelligence</button>
         <button data-tab="encounter" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Start Encounter</button>
+        <button data-tab="diagnostic" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Diagnostic Support</button>
         <button data-tab="checker" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">Orders & Follow-Up Checker</button>
         <button data-tab="after" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">After-Visit Orchestrator</button>
       </nav>
       <div class="mt-auto rounded-xl border border-amber-400/30 bg-amber-400/10 p-4 text-xs text-amber-100 leading-relaxed">
-        Prototype only. Uses fictional data. Supports clinician review and workflow organization; it does not diagnose, prescribe, or replace clinical judgment.
+        Prototype only. Uses fictional data. Supports clinician review, workflow organization, and diagnostic decision support. It does not autonomously diagnose, prescribe, or replace clinical judgment.
       </div>
     </aside>
 
@@ -49,7 +50,7 @@
         </div>
         <div class="flex gap-2 flex-wrap items-center">
           <button id="startEncounterTop" class="px-4 py-2 rounded-xl bg-cyan-600 text-white text-sm font-medium shadow-soft hover:bg-cyan-700">● Start Encounter</button>
-          <span class="px-3 py-1 rounded-full bg-violet-100 text-violet-700 text-xs font-medium">3 new modules added</span>
+          <span class="px-3 py-1 rounded-full bg-violet-100 text-violet-700 text-xs font-medium">Clinical decision support added</span>
           <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium">Fictional patient data</span>
           <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">Human review required</span>
         </div>
@@ -442,6 +443,16 @@
                 </div>
               </div>
             </div>
+            <div class="grid md:grid-cols-2 gap-4 mt-4">
+              <div class="rounded-xl border border-slate-200 p-4">
+                <div class="flex items-center justify-between mb-3"><div class="font-medium">Symptoms Intelligence</div><span class="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">Live extraction</span></div>
+                <div id="symptomIntel" class="space-y-2 text-sm text-slate-500"><div>Start the encounter to extract symptom details.</div></div>
+              </div>
+              <div class="rounded-xl border border-slate-200 p-4">
+                <div class="flex items-center justify-between mb-3"><div class="font-medium">Coding Preview</div><span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">Physician review</span></div>
+                <div id="codingPreview" class="space-y-2 text-sm text-slate-500"><div>Diagnosis and medication coding candidates will appear after clinical context is available.</div></div>
+              </div>
+            </div>
           </div>
           <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
             <h3 class="font-semibold text-lg mb-3">Draft Note</h3>
@@ -452,6 +463,49 @@
             </div>
             <button id="approveNote" disabled class="mt-4 w-full px-4 py-2 rounded-xl bg-slate-200 text-slate-500 text-sm font-medium cursor-not-allowed">Review & Approve Draft</button>
             <p class="text-[11px] text-slate-400 mt-2">Approval is simulated. Production use would require EHR integration, consent, security, auditability, and clinical governance.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="diagnostic" class="tab-panel hidden">
+        <div class="grid xl:grid-cols-3 gap-5">
+          <div class="xl:col-span-2 bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+              <div>
+                <h3 class="font-semibold text-lg">AI Diagnostic Support</h3>
+                <p class="text-sm text-slate-500">Differential diagnosis support using fictional chart context. Physician remains the final decision-maker.</p>
+              </div>
+              <button id="runDiagnostic" class="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-medium">Generate candidates</button>
+            </div>
+            <div class="rounded-xl bg-amber-50 border border-amber-200 p-4 text-sm mb-4"><strong>Important:</strong> These are diagnostic considerations for physician review, not autonomous diagnoses. Production use would require validated clinical decision-support design, traceable evidence, governance, and regulatory review.</div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="rounded-xl border border-slate-200 p-4">
+                <div class="font-medium mb-3">Symptoms & Context</div>
+                <div class="space-y-2 text-sm text-slate-600">
+                  <div>• Intermittent dizziness</div><div>• More noticeable when standing</div><div>• Began after antihypertensive dose increase</div><div>• No fainting reported</div><div>• No chest pain reported</div><div>• No shortness of breath reported</div><div>• Follow-up metabolic panel remains incomplete</div>
+                </div>
+              </div>
+              <div class="rounded-xl border border-slate-200 p-4">
+                <div class="font-medium mb-3">Information Gaps</div>
+                <div class="space-y-2 text-sm text-slate-600">
+                  <div>• Exact symptom frequency not quantified</div><div>• Orthostatic vitals not documented in this demo</div><div>• Hydration status not documented</div><div>• Latest metabolic panel unavailable</div>
+                </div>
+              </div>
+            </div>
+            <div id="diagnosticOutput" class="mt-4 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">Click <strong>Generate candidates</strong> to simulate a differential diagnosis support view.</div>
+          </div>
+          <div class="space-y-5">
+            <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+              <h3 class="font-semibold text-lg mb-3">ICD-10-CM Coding Assistant</h3>
+              <div id="icdCandidates" class="space-y-3 text-sm"><div class="rounded-xl bg-slate-50 p-3 text-slate-500">Awaiting physician-reviewed diagnostic context.</div></div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5">
+              <h3 class="font-semibold text-lg mb-3">Medication Coding</h3>
+              <div class="space-y-3 text-sm">
+                <div class="rounded-xl bg-blue-50 p-3"><strong>Lisinopril 20 mg oral tablet</strong><div class="text-slate-600 mt-1">Active • once daily • RxNorm identifier would be retrieved from a terminology service in production.</div></div>
+                <div class="rounded-xl bg-slate-50 p-3 text-slate-600">Medication codes are terminology-service lookups, not generated from memory by the AI.</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -721,6 +775,20 @@
     `;
   };
 
+  document.getElementById('runDiagnostic').onclick = () => {
+    document.getElementById('diagnosticOutput').innerHTML = `
+      <div class="font-medium mb-3">Differential diagnosis candidates — physician review required</div>
+      <div class="space-y-3">
+        <div class="rounded-xl bg-amber-50 p-3"><strong>1. Orthostatic hypotension / medication-related blood pressure effect</strong><div class="text-slate-600 mt-1">Supporting context: positional dizziness after antihypertensive dose increase. Missing: orthostatic vitals and current metabolic panel.</div></div>
+        <div class="rounded-xl bg-slate-50 p-3"><strong>2. Nonspecific dizziness</strong><div class="text-slate-600 mt-1">Symptom-level coding remains appropriate if the physician has not established a more specific diagnosis.</div></div>
+        <div class="rounded-xl bg-slate-50 p-3"><strong>3. Other causes</strong><div class="text-slate-600 mt-1">The system would surface additional evidence-based considerations only when sufficient chart data are available.</div></div>
+      </div>`;
+    document.getElementById('icdCandidates').innerHTML = `
+      <div class="rounded-xl bg-blue-50 p-3"><strong>R42</strong><div class="text-slate-600 mt-1">Dizziness and giddiness — symptom code candidate.</div></div>
+      <div class="rounded-xl bg-amber-50 p-3"><strong>I95.1</strong><div class="text-slate-600 mt-1">Orthostatic hypotension — candidate only if supported and selected by the physician.</div></div>
+      <div class="rounded-xl bg-slate-50 p-3"><strong>Final coding:</strong><div class="text-slate-600 mt-1">Physician selects, modifies, or rejects candidates before sign-off.</div></div>`;
+  };
+
   document.querySelectorAll('.workflow').forEach(btn => btn.addEventListener('click', ()=>{
     document.getElementById('workflowStatus').textContent = `${btn.querySelector('.font-medium').textContent} queued for clinician review — no action is executed automatically in this prototype.`;
   }));
@@ -812,14 +880,23 @@
     }
   }
   function updateEncounterAI(){
-    if(encounterIndex>=2) document.getElementById('clinicalPoints').innerHTML='<div class="rounded-lg bg-amber-50 p-3"><strong>Symptom mentioned:</strong> intermittent dizziness after medication dose change.</div><div class="rounded-lg bg-slate-50 p-3"><strong>Trend:</strong> patient reports some BP improvement.</div>';
-    if(encounterIndex>=5) document.getElementById('clinicalPoints').innerHTML += '<div class="rounded-lg bg-rose-50 p-3"><strong>Outstanding:</strong> follow-up metabolic panel.</div><div class="rounded-lg bg-emerald-50 p-3"><strong>Completed:</strong> cardiology consultation.</div><div class="rounded-lg bg-violet-50 p-3"><strong>Workflow mention:</strong> six-month follow-up discussed.</div>';
+    if(encounterIndex>=2) {
+      document.getElementById('clinicalPoints').innerHTML='<div class="rounded-lg bg-amber-50 p-3"><strong>Symptom mentioned:</strong> intermittent dizziness after medication dose change.</div><div class="rounded-lg bg-slate-50 p-3"><strong>Trend:</strong> patient reports some BP improvement.</div>';
+      document.getElementById('symptomIntel').innerHTML='<div class="rounded-lg bg-amber-50 p-3"><strong>Dizziness</strong><div class="text-slate-600 mt-1">Intermittent • positional pattern reported • began after medication dose change.</div></div><div class="rounded-lg bg-slate-50 p-3"><strong>Missing detail</strong><div class="text-slate-600 mt-1">Frequency and severity not yet quantified.</div></div>';
+    }
+    if(encounterIndex>=5) {
+      document.getElementById('clinicalPoints').innerHTML += '<div class="rounded-lg bg-rose-50 p-3"><strong>Outstanding:</strong> follow-up metabolic panel.</div><div class="rounded-lg bg-emerald-50 p-3"><strong>Completed:</strong> cardiology consultation.</div><div class="rounded-lg bg-violet-50 p-3"><strong>Workflow mention:</strong> six-month follow-up discussed.</div>';
+      document.getElementById('symptomIntel').innerHTML += '<div class="rounded-lg bg-emerald-50 p-3"><strong>Associated negatives</strong><div class="text-slate-600 mt-1">No fainting, chest pain, or shortness of breath reported.</div></div>';
+      document.getElementById('codingPreview').innerHTML='<div class="rounded-lg bg-blue-50 p-3"><strong>Symptom code candidate</strong><div class="text-slate-600 mt-1">R42 — Dizziness and giddiness (candidate only; physician review required).</div></div><div class="rounded-lg bg-slate-50 p-3"><strong>Medication terminology</strong><div class="text-slate-600 mt-1">Lisinopril 20 mg oral tablet — RxNorm lookup would populate in production.</div></div>';
+    }
     if(encounterIndex>=7) document.getElementById('draftNote').innerHTML='<div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">HPI</div><p class="mt-1 text-slate-600">Follow-up after antihypertensive dose adjustment. Patient reports improved blood pressure with intermittent positional dizziness. Denies fainting, chest pain, or shortness of breath in this fictional encounter.</p></div><div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">Assessment Context</div><p class="mt-1 text-slate-600">Medication tolerance requires clinician review. Cardiology consultation completed. Follow-up metabolic panel remains outstanding.</p></div><div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">Plan — Draft</div><p class="mt-1 text-slate-600">Complete ordered lab work, continue home BP tracking, generate patient-friendly summary, and schedule six-month follow-up. Final plan requires physician verification and editing.</p></div><div class="rounded-xl bg-blue-50 p-3"><div class="text-xs text-blue-500 uppercase tracking-wide">Language Handling</div><p class="mt-1 text-slate-600">Original-language transcript preserved. English clinical note generated for physician review. Production version could support bilingual documentation and configurable note language.</p></div>';
   }
   function resetEncounter(){
     clearInterval(encounterTimer); encounterRunning=false; encounterIndex=0;
     document.getElementById('transcript').innerHTML='<p class="text-slate-400">Start the encounter to simulate ambient transcription.</p>';
     document.getElementById('clinicalPoints').innerHTML='<div class="text-slate-400">Key points will appear as the encounter progresses.</div>';
+    document.getElementById('symptomIntel').innerHTML='<div>Start the encounter to extract symptom details.</div>';
+    document.getElementById('codingPreview').innerHTML='<div>Diagnosis and medication coding candidates will appear after clinical context is available.</div>';
     document.getElementById('draftNote').innerHTML='<div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">HPI</div><p class="mt-1 text-slate-500">Pending encounter...</p></div><div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">Assessment Context</div><p class="mt-1 text-slate-500">Pending clinician review...</p></div><div class="rounded-xl bg-slate-50 p-3"><div class="text-xs text-slate-400 uppercase tracking-wide">Plan</div><p class="mt-1 text-slate-500">Pending encounter...</p></div>';
     document.getElementById('encounterStatus').textContent='Ready. No audio is recorded in this prototype.';
     document.getElementById('liveBadge').textContent='Idle'; document.getElementById('liveBadge').className='text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-500';
